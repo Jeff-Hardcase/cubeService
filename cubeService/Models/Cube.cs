@@ -44,17 +44,32 @@ namespace cubeService.Models
         public void DoMove(CubeMove move)
         {
             var SaveFace = new CubeFace(cubeSize);
+            int i, j, k;
+            CubeFace endFace = null;
+            CubeValue end = CubeValue.None;
 
             switch (move.Plane)
             {
-
                 case CubePlane.X:
                     //save before move
-                    
-                    if (move.Level == 0 || move.Level == (cubeSize - 1))
-                    {
+                    if (move.Level == 0)
+                        endFace = LeftFace;
+                    else if (move.Level == (cubeSize - 1))
+                        endFace = RightFace;
 
+                    for (i = 0; i < cubeSize; i++){
+                        
+                        var front = FrontFace.GetFaceValue(move.Level, i);
+                        SaveFace.SetFaceValue(move.Level, i, front);
+
+                        if (endFace != null)
+                        {
+                            end = endFace.GetFaceValue(move.Level, i);
+                            SaveFace.SetFaceValue(move.Level, i, end);
+                        }
                     }
+                    
+                    
                     break;
                 case CubePlane.Y:
                     break;
