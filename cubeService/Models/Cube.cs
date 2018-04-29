@@ -43,7 +43,24 @@ namespace cubeService.Models
 
         public void DoMove(CubeMove move)
         {
+            var SaveFace = new CubeFace(cubeSize);
 
+            switch (move.Plane)
+            {
+
+                case CubePlane.X:
+                    //save before move
+                    
+                    if (move.Level == 0 || move.Level == (cubeSize - 1))
+                    {
+
+                    }
+                    break;
+                case CubePlane.Y:
+                    break;
+                case CubePlane.Z:
+                    break;
+            }
         }
     }
 }
