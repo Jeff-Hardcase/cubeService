@@ -58,14 +58,34 @@ namespace cubeService.Models
                         endFace = RightFace;
 
                     for (i = 0; i < cubeSize; i++){
+                        j = Math.Abs(i - cubeSize - 1);
                         
                         var front = FrontFace.GetFaceValue(move.Level, i);
                         SaveFace.SetFaceValue(move.Level, i, front);
+
+                        //do plane move
+                        if (move.Direction == CubeMoveDirection.Right)
+                        {
+                            FrontFace.SetFaceValue(move.Level, i, UpFace.GetFaceValue(move.Level, i));
+                            UpFace.SetFaceValue(move.Level, i, BackFace.GetFaceValue(move.Level, j));
+                            BackFace.SetFaceValue(move.Level, j, DownFace.GetFaceValue(move.Level, j));
+                            DownFace.SetFaceValue(move.Level, j, SaveFace.GetFaceValue(move.Level, i));
+                        }
+                        else
+                        {
+                            FrontFace.SetFaceValue(move.Level, i, DownFace.GetFaceValue(move.Level, j));
+                            DownFace.SetFaceValue(move.Level, j, BackFace.GetFaceValue(move.Level, j));
+                            BackFace.SetFaceValue(move.Level, j, UpFace.GetFaceValue(move.Level, i));
+                            UpFace.SetFaceValue(move.Level, i, SaveFace.GetFaceValue(move.Level, i));
+                        }
 
                         if (endFace != null)
                         {
                             end = endFace.GetFaceValue(move.Level, i);
                             SaveFace.SetFaceValue(move.Level, i, end);
+
+                            //do face move
+
                         }
                     }
                     
