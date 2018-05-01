@@ -47,7 +47,7 @@ namespace cubeService.Models
             int i, j, k;
             CubeFace endFace = null;
             CubeValue end = CubeValue.None;
-
+            
             switch (move.Plane)
             {
                 case CubePlane.X:
@@ -58,7 +58,7 @@ namespace cubeService.Models
                         endFace = RightFace;
 
                     for (i = 0; i < cubeSize; i++){
-                        j = Math.Abs(i - cubeSize - 1);
+                        j = Math.Abs(i - (cubeSize - 1));
                         
                         var front = FrontFace.GetFaceValue(move.Level, i);
                         SaveFace.SetFaceValue(move.Level, i, front);
@@ -79,13 +79,26 @@ namespace cubeService.Models
                             UpFace.SetFaceValue(move.Level, i, SaveFace.GetFaceValue(move.Level, i));
                         }
 
-                        if (endFace != null)
+                        if (endFace != null && i < (cubeSize - 1))
                         {
-                            end = endFace.GetFaceValue(move.Level, i);
-                            SaveFace.SetFaceValue(move.Level, i, end);
+                            end = endFace.GetFaceValue(0, i);
+                            SaveFace.SetFaceValue(0, i, end);
 
                             //do face move
-
+                            if (move.Direction == CubeMoveDirection.Right)
+                            {
+                                endFace.SetFaceValue(0, i, endFace.GetFaceValue(j, i));
+                                endFace.SetFaceValue(j, i, endFace.GetFaceValue(j, j));
+                                endFace.SetFaceValue(j, j, endFace.GetFaceValue(0, j));
+                                endFace.SetFaceValue(0, j, SaveFace.GetFaceValue(0, i));
+                            }
+                            else
+                            {
+                                endFace.SetFaceValue(0, 1, endFace.GetFaceValue(0, j));
+                                endFace.SetFaceValue(0, j, endFace.GetFaceValue(j, j));
+                                endFace.SetFaceValue(j, j, endFace.GetFaceValue(j, i));
+                                endFace.SetFaceValue(j, i, SaveFace.GetFaceValue(0, i));
+                            }
                         }
                     }
                     
