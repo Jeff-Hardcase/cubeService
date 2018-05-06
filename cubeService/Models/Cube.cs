@@ -8,6 +8,7 @@ namespace cubeService.Models
     public class Cube
     {
         private int cubeSize;
+        private int faceMax;
 
         public CubeFace FrontFace { get; set; }
         public CubeFace BackFace { get; set; }
@@ -19,6 +20,7 @@ namespace cubeService.Models
         public Cube()
         {
             cubeSize = 3;
+            faceMax = cubeSize - 1;
 
             FrontFace = new CubeFace(cubeSize);
             BackFace = new CubeFace(cubeSize);
@@ -43,13 +45,11 @@ namespace cubeService.Models
 
         public void DoMove(CubeMove move)
         {
-            var SaveFace = new CubeFace(cubeSize);
             int i, j;
 
             CubeFace endFace = null;
-            CubeValue faceValue = CubeValue.None;
             CubeValue planeValue = CubeValue.None;
-            int faceMax = cubeSize - 1;
+            
             int z = Math.Abs(move.Level - faceMax);
             
             switch (move.Plane)
@@ -61,9 +61,9 @@ namespace cubeService.Models
                     else if (move.Level == faceMax)
                         endFace = RightFace;
 
-                    for (i = 0; i < cubeSize; i++){
+                    for (i = 0; i < cubeSize; i++)
+                    {
                         j = Math.Abs(i - faceMax);
-                        
                         planeValue = FrontFace.GetFaceValue(move.Level, i);
 
                         //do plane move
@@ -82,26 +82,8 @@ namespace cubeService.Models
                             UpFace.SetFaceValue(move.Level, i, planeValue);
                         }
 
-                        if (endFace != null && i < faceMax)
-                        {
-                            faceValue = endFace.GetFaceValue(0, i);
-
-                            //do face move
-                            if (move.Direction == CubeMoveDirection.Right)
-                            {
-                                endFace.SetFaceValue(0, i, endFace.GetFaceValue(j, i));
-                                endFace.SetFaceValue(j, i, endFace.GetFaceValue(j, j));
-                                endFace.SetFaceValue(j, j, endFace.GetFaceValue(0, j));
-                                endFace.SetFaceValue(0, j, faceValue);
-                            }
-                            else
-                            {
-                                endFace.SetFaceValue(0, 1, endFace.GetFaceValue(0, j));
-                                endFace.SetFaceValue(0, j, endFace.GetFaceValue(j, j));
-                                endFace.SetFaceValue(j, j, endFace.GetFaceValue(j, i));
-                                endFace.SetFaceValue(j, i, faceValue);
-                            }
-                        }
+                        //do face move maybe
+                        DoFaceMove(endFace, move.Direction, i, j);
                     }
                    
                     break;
@@ -115,15 +97,14 @@ namespace cubeService.Models
                     for (i = 0; i < cubeSize; i++)
                     {
                         j = Math.Abs(i - faceMax);
-
                         planeValue = LeftFace.GetFaceValue(z, i);
 
                         //do plane move
                         if (move.Direction == CubeMoveDirection.Right)
                         {
-                            LeftFace.SetFaceValue(z, i, DownFace.GetFaceValue(i,move.Level));
-                            DownFace.SetFaceValue(i, move.Level, RightFace.GetFaceValue(z, i));
-                            RightFace.SetFaceValue(z, i, UpFace.GetFaceValue(i, move.Level));
+                            LeftFace.SetFaceValue(z, i, DownFace.GetFaceValue(j, move.Level));
+                            DownFace.SetFaceValue(j, move.Level, RightFace.GetFaceValue(z, j));
+                            RightFace.SetFaceValue(z, j, UpFace.GetFaceValue(i, move.Level));
                             UpFace.SetFaceValue(i, move.Level, planeValue);
                         }
                         else
@@ -135,31 +116,69 @@ namespace cubeService.Models
                         }
 
                         //do face move maybe
-                        if (endFace != null && i < faceMax)
-                        {
-                            faceValue = endFace.GetFaceValue(i, 0);
-
-                            if (move.Direction == CubeMoveDirection.Right)
-                            {
-                                endFace.SetFaceValue(i, 0, endFace.GetFaceValue(faceMax, i));
-                                endFace.SetFaceValue(faceMax, i, endFace.GetFaceValue(j, faceMax));
-                                endFace.SetFaceValue(j, faceMax, endFace.GetFaceValue(0, j));
-                                endFace.SetFaceValue(0, j, faceValue);
-                            }
-                            else
-                            {
-                                endFace.SetFaceValue(i, 0, endFace.GetFaceValue(0, j));
-                                endFace.SetFaceValue(0, j, endFace.GetFaceValue(j, faceMax));
-                                endFace.SetFaceValue(j, faceMax, endFace.GetFaceValue(faceMax, i));
-                                endFace.SetFaceValue(faceMax, i, faceValue);
-                            }
-                        }
+                        DoFaceMove(endFace, move.Direction, i, j);
                     }
 
                     break;
                 case CubePlane.Z:
+                    //save before move
+                    if (move.Level == 0)
+                        endFace = DownFace;
+                    else if (move.Level == faceMax)
+                        endFace = UpFace;
+
+                    for (i = 0; i < cubeSize; i++)
+                    {
+                        j = Math.Abs(i - faceMax);
+                        planeValue = FrontFace.GetFaceValue(i, move.Level);
+
+                        //do plane move
+                        if (move.Direction == CubeMoveDirection.Right)
+                        {
+                            FrontFace.SetFaceValue(i, move.Level, RightFace.GetFaceValue(j, move.Level));
+                            RightFace.SetFaceValue(j, move.Level, BackFace.GetFaceValue(j, move.Level));
+                            BackFace.SetFaceValue(j, move.Level, LeftFace.GetFaceValue(i, move.Level));
+                            LeftFace.SetFaceValue(i, move.Level, planeValue);
+                        }
+                        else
+                        {
+                            FrontFace.SetFaceValue(i, move.Level, LeftFace.GetFaceValue(i, move.Level));
+                            LeftFace.SetFaceValue(i, move.Level, BackFace.GetFaceValue(j, move.Level));
+                            BackFace.SetFaceValue(j, move.Level, RightFace.GetFaceValue(j, move.Level));
+                            RightFace.SetFaceValue(j, move.Level, planeValue);
+                        }
+
+                        //do face move maybe
+                        DoFaceMove(endFace, move.Direction, i, j);
+                    }
+
                     break;
             }
+        }
+
+        private void DoFaceMove(CubeFace face, CubeMoveDirection direction, int i, int j)
+        {
+            if (face != null && i < faceMax)
+            {
+                var faceValue = face.GetFaceValue(i, 0);
+
+                if (direction == CubeMoveDirection.Right)
+                {
+                    face.SetFaceValue(i, 0, face.GetFaceValue(faceMax, i));
+                    face.SetFaceValue(faceMax, i, face.GetFaceValue(j, faceMax));
+                    face.SetFaceValue(j, faceMax, face.GetFaceValue(0, j));
+                    face.SetFaceValue(0, j, faceValue);
+                }
+                else
+                {
+                    face.SetFaceValue(i, 0, face.GetFaceValue(0, j));
+                    face.SetFaceValue(0, j, face.GetFaceValue(j, faceMax));
+                    face.SetFaceValue(j, faceMax, face.GetFaceValue(faceMax, i));
+                    face.SetFaceValue(faceMax, i, faceValue);
+                }
+            }
+
+            return;
         }
     }
 }
