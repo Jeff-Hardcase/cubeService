@@ -101,6 +101,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Cube.cs" />
+    <Compile Include="Models\xCube.cs" />
     <Compile Include="Models\CubeFace.cs" />
     <Compile Include="Models\CubeMove.cs" />
     <Compile Include="Models\Repositories\CubeSolveRepository.cs" />

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using cubeService.Models;
 
 namespace cubeService.Controllers
 {
@@ -19,7 +20,12 @@ namespace cubeService.Controllers
         // GET api/<controller>/5
         public string Get(string cubeState)
         {
-            return "This will be the solution. The cube state was given as " + cubeState;
+            var myCube = new Cube();
+            myCube.Init();
+
+            var myCubeJson = Newtonsoft.Json.JsonConvert.SerializeObject(myCube);
+
+            return "This will be the solution. The cube state was given as " + myCubeJson;
         }
 
     }
