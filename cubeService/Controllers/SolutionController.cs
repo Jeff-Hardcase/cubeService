@@ -23,9 +23,15 @@ namespace cubeService.Controllers
             var myCube = new Cube();
             myCube.Init();
 
-            var myCubeJson = Newtonsoft.Json.JsonConvert.SerializeObject(myCube);
+            //var myCubeJson = Newtonsoft.Json.JsonConvert.SerializeObject(myCube);
+            var result = string.Empty;
+            var z = 3;
 
-            return "This will be the solution. The cube state was given as " + myCubeJson;
+            for (var y = 1; y < 4; y++)
+                for (var x = 1; x < 4; x++)
+                    result += string.Format("{0}{1}{2} - {3}, ", x, y, z, myCube.cubelets[x, y, z].Z);
+
+            return result;
         }
 
     }

@@ -24,7 +24,7 @@ namespace cubeService.Models
                     {
                         cubelets[x, y, z] = new Cubelet
                         {
-                            X = (y == Size ? CubeValue.Right : CubeValue.Left),
+                            X = (y == Size ? CubeValue.Left : CubeValue.Right),
                             Y = (x == Size ? CubeValue.Back : CubeValue.Front),
                             Z = (z == Size ? CubeValue.Up : CubeValue.Down)
                         };
